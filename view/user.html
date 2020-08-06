@@ -1,0 +1,62 @@
+<br/>
+<form method="post" id="main_form">
+    <table class="table rounded table-bordered table-hover text-center" style="width: 85%" align="center" bordercolor="black" border=5>
+        <thead>
+        <td style="padding-top: 15px; padding-bottom: 15px;" align="center" colspan="8">Объект <?=$user_res =='W'?'водоснабжения':'энергоснабжения';?>:<br/>
+                <b><i><u>Трансформаторные подстанции и опорно-усилительные станции ТУС №<?=$user_tus;?></u></i></b>
+                <br/><b>О Т Ч Е Т</b> &nbsp;по расходу <?=$user_res=='W'?'воды':'электричества';?> за <?=array_flip($month_sel)[date('m')].' '.date('Y');?> г.<br/></td>
+            <tr align="center">
+                <th class="align-middle" style='width: 10%' rowspan="2" colspan="2">Объект</th>
+                <th class="align-middle" style='width: 11%' rowspan="2">Номер счетчика</th>
+                <th class="align-middle" style='width: 19%' colspan="2">Показание счетчика</th>
+                <th class="align-middle" style='width: 10%' rowspan="2">Разность показаний</th>
+                <th class="align-middle" rowspan="2">Примечание</th>
+                <th class="align-middle" style='width: 23%' rowspan="2">Изменил</th>
+            </tr>
+            <tr align="center">
+                <th class="align-middle">в прошлом месяце</th>
+                <th class="align-middle">в текущем месяце</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+                $str_type = '';
+                foreach ($data as $d) { ?>
+                    <tr align="center">
+                        <?php
+                            if ($d['str_type'] != $str_type) {
+                                $i = 0;
+                            }
+                            if ($i == 0) {
+                                echo "<td class='align-middle' rowspan='" . $st_arr[$d['str_type']] . "'>" . $d['str_type'] . "</td>";
+                            } 
+                        ?>
+                        <td class="align-middle" style='height: 40px'><?=$d['str_num'];?></td>
+                        <td class="align-middle" style='height: 40px'><?=$user_res=='W'?$d['wm_num']:$d['em_num'];?></td>
+                        <td class="init_value align-middle" style='height: 40px'><?=$d['meter_value'];?></td>
+                        <td class="align-middle" style='height: 40px'>
+                            <?=!empty($d['last_val']) ? 
+                                            $d['last_val'] . "<input hidden class='form-control last_value' style='text-align: center;' name='lastVal[]' />" :
+                                                "<input class='form-control last_value' style='text-align: center;' name='lastVal[]' onkeyup=\"calc($(this))\" />"; ?>
+                        </td>
+                        <td class="result align-middle" style='height: 40px'>
+                            <?=!empty($d['last_val']) ? ($d['last_val']-$d['meter_value']) : '';?>
+                        </td>
+                        <td class="align-middle" style='height: 40px'>
+                            <?=!empty($d['notes']) ? 
+                                            $d['notes'] . "<input hidden class='form-control notes' style='text-align: center;' name='notes[]' />" :
+                                                "<input class='form-control notes' style='text-align: center;' name='notes[]' />"; ?></td>
+                        <td class="align-middle" style='height: 40px'><?=$d['editor'];?></td>
+                    </tr>
+            <?php 
+                    $str_type = $d['str_type'];
+                    $i++;
+                }
+            ?>
+        </tbody>
+    </table>
+
+    <div style="display: flex; justify-content: flex-end;">
+        <button type='submit' class="btn btn-primary" style="margin-right: 134px;" form="main_form" id="userAdd" name="userAdd">Сохранить</button>
+    </div>
+</form>

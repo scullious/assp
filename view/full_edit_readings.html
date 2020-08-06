@@ -1,0 +1,118 @@
+<form method="post" id="filter">
+    <div style="display: flex; justify-content: center;">
+        <select class="form-control" style="width: 10%; margin-right: 20px;" name="year">
+            <?php
+                foreach ($year_sel as $ys) { ?>
+                <option <?=!empty($_POST['year'])&&($_POST['year']==$ys)?'selected':'';?> value='<?=$ys;?>'><?=$ys;?></option>
+            <?php
+                } 
+            ?>
+        </select>
+        <select class="form-control" style="width: 10%; margin-right: 20px;" name="month">
+            <?php   
+                foreach ($month_sel as $month => $id) { ?>
+                <option <?=!empty($_POST['month'])&&($_POST['month']==$month)?'selected':'';?> value="<?=$month;?>"><?=$month;?></option>
+            <?php
+                }  
+            ?>
+        </select>
+        <button type="submit" class="btn btn-outline-dark" form="filter" name='form_table'>Сформировать</button>
+    </div>
+</form>
+
+<br/>
+<form method="post" id="main_form">
+    <?php if (isset($_POST['form_table'])) { ?>
+        <table class="table rounded table-bordered table-hover text-center" style="width: 85%" align="center" bordercolor="black" border=5>
+            <thead>
+                <td style="padding-top: 15px; padding-bottom: 15px;" align="center" colspan="8">
+                        Объект водоснабжения:<br/>
+<!--!!!-->                        <b><i><u>Трансформаторные подстанции и опорно-усилительные станции <?=$data[0]['tus'];?></u></i></b><br/>
+                        <b><?=$_POST['month']." ".$_POST['year'];?> года</b>
+                </td>
+                <tr align="center">
+                    <th class="align-middle" colspan="2">Объект</th>
+                    <th class="align-middle">Номер счетчика</th>
+                    <th class="align-middle">Показание счетчика в этом месяце</th>
+                    <!-- th class="align-middle">Разность показаний</th -->
+                    <th class="align-middle">Примечание</th>
+                    <th class="align-middle">Изменил</th>
+                    <th class="align-middle"></th>
+                    <th hidden>id</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $str_type = '';
+                    if (!empty($data)) {
+                        foreach ($data as $d) { ?>
+                            <tr align="center">
+                                <?php
+                                    if ($d['str_type'] != $str_type) {
+                                        $i = 0;
+                                    }
+                                    if ($i == 0) {
+                                        echo "<td class='align-middle' rowspan='" . $st_arr[$d['str_type']] . "'>" . $d['str_type'] . "</td>";
+                                    } 
+                                ?>
+                                <td class="align-middle"><?=$d['str_num'];?></td>
+                                <td class="align-middle"><?=$d['wm_id'];?></td>
+                                <td class="align-middle"><?=$d['meter_value'];?></td>
+                                <!-- td class="result align-middle"></td -->
+                                <td class="align-middle"></td>
+                                <td class="align-middle" style="width: 200px;"></td>
+                                <td class="align-middle" style="width: 20px;">
+                                    <button type="button" class="btn btn-light btn-edit" style="background-color: white;" data-toggle="modal" data-target="#edit" name="edit_<?=$d['wm_id'];?>" value="<?=$d['wm_id'];?>">
+                                        <img src="../img/edit.png" width="20px" />
+                                    </button>
+                                </td>
+                                <td hidden><?=$d['reading_id'];?></td>
+                            </tr>
+                    <?php 
+                            $str_type = $d['str_type'];
+                            $i++;
+                        }
+                    }
+                ?>
+            </tbody>
+        </table>
+    <?php }?>
+</form>
+
+<div style="display: flex; justify-content: flex-end;">
+    <button hidden class="btn btn-primary" style="margin-right: 140px;" form="main_form" id="userAdd" name="userAdd">Сохранить</button>
+</div>
+
+<div id='edit' class='modal' style='background-color: rgba(100,100,100,0.3);'>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+        <div class='modal-content'>
+            <div class='modal-header' style='justify-content: flex-end;'>
+                <h2 class="modal-title align-middle">Редактирование данных</h2>
+                <span class='close' style="padding: 0px; padding-right: 3px; margin-left: 94px;">&times;</span>
+            </div>
+            <div class='modal-body'>
+                <table class='table rounded table-bordered text-center'>
+                    <thead>
+                        <th class="align-middle">Объект</th>
+                        <th class="align-middle">Номер счетчика</th>
+                        <th class="align-middle">Показание счетчика</th>
+                        <th class="align-middle">Примечание</th>
+                        <th class="align-middle">Изменил</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class='align-middle' id='objName'></td>
+                            <td class='align-middle' id='wmId'></td>
+                            <td class='align-middle'><input class='form-control' style="text-align:right;" id='value' /></td>
+                            <td class='align-middle' style="width: 100px;" id='notes'></td>
+                            <td class='align-middle' style="width: 150px;" id='editor'></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id='editSave' data-dismiss="modal">Сохранить</button>
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Назад</button>
+            </div>
+        </div>
+    </div>
+</div>
